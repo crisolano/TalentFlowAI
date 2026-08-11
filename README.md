@@ -69,16 +69,27 @@ Luego entra a <http://localhost:8080>.
 Un `POST` con `FormData` (el navegador fija el `Content-Type` y el `boundary`;
 el código no los toca):
 
-| Campo | Tipo | Ejemplo |
-|---|---|---|
-| `nombre` | texto | `María Fernanda Ríos` |
-| `correo` | texto | `maria.rios@correo.com` |
-| `telefono` | texto | `+57 300 123 4567` |
-| `vacante` | texto (slug) | `frontend-jr` |
-| `cv` | **archivo binario** | `CV_Maria_Rios.pdf` |
+| Campo | Tipo | Obligatorio | Ejemplo |
+|---|---|---|---|
+| `nombre` | texto | sí | `María Fernanda Ríos` |
+| `correo` | texto | sí | `maria.rios@correo.com` |
+| `telefono` | texto | sí | `+57 300 123 4567` |
+| `vacante` | texto (slug) | sí | `frontend-jr` |
+| `experiencia` | texto numérico, 0–50 | sí | `3` |
+| `tecnologias` | texto libre | no | `JavaScript, React, SQL` |
+| `consentimiento` | texto | sí | `si` |
+| `cv` | **archivo binario** | sí | `CV_Maria_Rios.pdf` |
 
 El PDF viaja como archivo real en `multipart/form-data`, con su nombre y su MIME
 original. No se convierte a Base64 ni a JSON.
+
+`consentimiento` es la autorización de tratamiento de datos personales. El
+formulario no permite enviar sin marcarla, y siempre llega con el valor `si`;
+guárdala junto con la fecha, es el registro de la aceptación.
+
+La petición incluye el header `ngrok-skip-browser-warning: true` para evitar la
+página de advertencia de ngrok. No se fija `Content-Type`: lo arma el navegador
+con el boundary del multipart.
 
 Los demás campos de la hoja de cálculo (`ID_Candidato`, `Experiencia`,
 `Habilidades`, `Nivel_Educativo`, `Score_Compatibilidad`, `Estado`,
@@ -91,20 +102,34 @@ Los demás campos de la hoja de cálculo (`ID_Candidato`, `Experiencia`,
    - Path: el que uses en `N8N_WEBHOOK_URL`
    - Respond: `Immediately` (o `Using Respond to Webhook`)
    - Binary Property / *Binary File*: activado, para que llegue el PDF
-2. **CORS** — el navegador llama al webhook desde otro origen. En el nodo
-   Webhook, en *Options*, agrega `Allowed Origins (CORS)` con el dominio donde
-   publiques el formulario (o `*` mientras pruebas). Sin esto el `fetch` falla
-   con "No pudimos enviar tu postulación" aunque n8n reciba los datos.
-3. **URL de prueba vs. producción** — la *Test URL* solo responde mientras el
-   editor está en modo escucha. Para uso real activa el workflow y usa la
-   *Production URL*.
-4. **Códigos de respuesta** — cualquier respuesta fuera del rango 2xx se muestra
-   al candidato como error recuperable, conservando sus datos.
+2. **CORS y preflight** — el navegador llama al webhook desde otro origen. En el
+   nodo Webhook, en *Options*, agrega `Allowed Origins (CORS)` con el dominio
+   donde publiques el formulario (o `*` mientras pruebas). Además, el header
+   `ngrok-skip-browser-warning` **no** es de los permitidos por defecto en CORS,
+   así que el navegador manda antes una petición `OPTIONS`: n8n debe responderla
+   aceptando ese header. Si el preflight falla, la alternativa es quitar el
+   header y usar un dominio propio de ngrok (los de pago no muestran el aviso).
+3. **URL de prueba vs. producción** — `/webhook-test/...` solo responde mientras
+   el editor está en modo escucha; `/webhook/...` requiere el workflow activo.
+   El proyecto apunta a la de producción.
+4. **Códigos de respuesta** — el frontend los distingue:
+
+   | Código | Campo que lee | Qué hace el formulario |
+   |---|---|---|
+   | `200` | `json.ticket` | Pantalla de éxito con el ticket. Si el campo no viene, muestra el éxito sin ticket. |
+   | `400` | `json.error` | Muestra ese texto como error corregible, conservando los datos. |
+   | `409` | `json.error` | Duplicado: muestra ese texto y **retira el botón de envío**. Se reactiva si el candidato cambia de correo o de vacante. |
+   | otro | — | Error genérico recuperable. |
+
+   Son los **únicos** nombres que se leen: `id`, `ticketId`, `ticket_id`,
+   `mensaje` o `message` se ignoran. Responde en JSON, como objeto o como
+   arreglo de un item (formato habitual de n8n). Un cuerpo HTML se descarta,
+   para que la página de aviso de ngrok no pase por éxito.
 5. **Validación en servidor** — repite en n8n las validaciones de correo,
-   teléfono, tipo y tamaño del archivo. Las del navegador son de usabilidad y
-   cualquiera puede saltárselas.
-6. **Duplicados** — comprueba `correo + vacante` en n8n antes de escribir en
-   Google Sheets.
+   teléfono, experiencia, consentimiento, y tipo y tamaño del archivo. Las del
+   navegador son de usabilidad y cualquiera puede saltárselas.
+6. **Duplicados** — comprueba `correo + vacante` en n8n y responde **409** para
+   que el formulario muestre el mensaje correcto en vez de un error genérico.
 
 ## 5. Probar la conexión
 

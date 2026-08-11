@@ -24,6 +24,7 @@
     panel: $('#panel'),
 
     vacanteGroup: $('#vacanteGroup'),
+    consentimiento: $('#consentimiento'),
 
     drop: $('#drop'),
     fileInput: $('#cv'),
@@ -37,6 +38,8 @@
       correo: $('#sumCorreo'),
       telefono: $('#sumTelefono'),
       vacante: $('#sumVacante'),
+      experiencia: $('#sumExperiencia'),
+      tecnologias: $('#sumTecnologias'),
       cv: $('#sumCv')
     },
 
@@ -47,7 +50,9 @@
     alertText: $('#alertText'),
 
     successView: $('#successView'),
-    doneStamp: $('#doneStamp')
+    doneStamp: $('#doneStamp'),
+    ticket: $('#doneTicket'),
+    ticketValue: $('#doneTicketValue')
   };
 
   const state = {
@@ -55,14 +60,15 @@
     file: null,
     submitting: false,
     failed: false,
+    duplicate: false,
     sent: false
   };
 
   const STEP_FIELDS = {
     1: ['nombre', 'correo', 'telefono'],
-    2: ['vacante'],
+    2: ['vacante', 'experiencia'],
     3: ['cv'],
-    4: []
+    4: ['consentimiento']
   };
 
   const STEP_NAMES = ['Información', 'Vacante', 'Hoja de vida', 'Enviar'];
@@ -133,8 +139,23 @@
       return '';
     },
 
+    experiencia() {
+      const value = getValue('experiencia');
+      if (!value) return 'Indica tus años de experiencia. Escribe 0 si estás empezando.';
+      if (!/^\d{1,2}$/.test(value)) return 'Escribe un número entero de años, sin decimales.';
+      if (Number(value) > 50) return 'Indica un número entre 0 y 50.';
+      return '';
+    },
+
     cv() {
       if (!state.file) return 'Adjunta tu hoja de vida en PDF.';
+      return '';
+    },
+
+    consentimiento() {
+      if (!dom.consentimiento.checked) {
+        return 'Necesitamos tu autorización para tratar tus datos y poder registrar la postulación.';
+      }
       return '';
     }
   };
@@ -241,10 +262,14 @@
   }
 
   function renderSummary() {
+    const anios = getValue('experiencia');
+
     dom.summary.nombre.textContent = getValue('nombre');
     dom.summary.correo.textContent = getValue('correo');
     dom.summary.telefono.textContent = getValue('telefono');
     dom.summary.vacante.textContent = vacanteLabel(getVacante());
+    dom.summary.experiencia.textContent = anios === '1' ? '1 año' : `${anios} años`;
+    dom.summary.tecnologias.textContent = getValue('tecnologias') || 'Sin especificar';
     dom.summary.cv.textContent = state.file
       ? `${state.file.name} · ${formatBytes(state.file.size)}`
       : '—';
@@ -255,7 +280,7 @@
   function renderVacantes() {
     const markup = CONFIG.VACANTES.map((vacante) => `
       <label class="choice">
-        <input class="choice__input" type="radio" name="vacante" value="${vacante.value}">
+        <input class="choice__input" type="radio" name="vacante" value="${vacante.value}" required>
         <span class="choice__box">
           <span class="choice__dot" aria-hidden="true"></span>
           <span>
@@ -361,8 +386,45 @@
     formData.append('correo', getValue('correo'));
     formData.append('telefono', getValue('telefono'));
     formData.append('vacante', getVacante());
+    formData.append('experiencia', getValue('experiencia'));
+    formData.append('tecnologias', getValue('tecnologias'));
+    formData.append('consentimiento', dom.consentimiento.value);
     formData.append('cv', state.file, state.file.name);
     return formData;
+  }
+
+  /* Contrato con el backend: estos son los únicos campos que se leen.
+     Éxito → json.ticket · Error 400 y 409 → json.error */
+  const TICKET_FIELD = 'ticket';
+  const ERROR_FIELD = 'error';
+
+  /** n8n puede responder JSON, un arreglo de items, texto plano o nada. */
+  async function readPayload(response) {
+    try {
+      const text = (await response.text()).trim();
+      if (!text) return {};
+
+      // Un cuerpo HTML no viene de n8n (proxy, portal de ngrok, error del host):
+      // no se muestra al candidato.
+      if (text.startsWith('<')) return {};
+
+      try {
+        const data = JSON.parse(text);
+        const item = Array.isArray(data) ? data[0] : data;
+        return item && typeof item === 'object' ? item : { [ERROR_FIELD]: String(item) };
+      } catch {
+        return { [ERROR_FIELD]: text }; // respuesta en texto plano
+      }
+    } catch {
+      return {};
+    }
+  }
+
+  /** Lee un campo del JSON como texto limpio; '' si no viene o llega vacío. */
+  function readField(payload, field) {
+    const value = payload[field];
+    if (value === undefined || value === null) return '';
+    return String(value).trim().slice(0, 300);
   }
 
   function setSubmitting(isSubmitting) {
@@ -392,10 +454,39 @@
     dom.alert.hidden = true;
   }
 
-  function showSuccess() {
+  /**
+   * 409: el backend ya tiene una postulación para este correo + vacante.
+   * Es terminal para estos datos, así que se retira el botón de envío; el
+   * candidato puede volver y elegir otra vacante para reactivarlo.
+   */
+  function markDuplicate(serverMessage) {
+    state.duplicate = true;
+    showAlert(
+      'Ya recibimos una postulación tuya para esta vacante.',
+      serverMessage ||
+        'Solo aceptamos una postulación por vacante. Si quieres aplicar a otro rol, vuelve al paso 2 y elige una vacante diferente.'
+    );
+    dom.submitBtn.hidden = true;
+  }
+
+  function clearDuplicate() {
+    if (!state.duplicate) return;
+    state.duplicate = false;
+    dom.submitBtn.hidden = false;
+    hideAlert();
+    dom.submitLabel.textContent = 'Enviar postulación';
+  }
+
+  function showSuccess(ticket) {
     state.sent = true;
     dom.form.hidden = true;
     dom.successView.hidden = false;
+
+    if (ticket) {
+      dom.ticketValue.textContent = ticket;
+      dom.ticket.hidden = false;
+    }
+
     dom.doneStamp.textContent = new Date().toLocaleString('es-CO', {
       dateStyle: 'long',
       timeStyle: 'short'
@@ -413,9 +504,9 @@
   }
 
   async function submitApplication() {
-    if (state.submitting || state.sent) return;
+    if (state.submitting || state.sent || state.duplicate) return;
 
-    for (let step = 1; step <= 3; step += 1) {
+    for (let step = 1; step <= TOTAL_STEPS; step += 1) {
       if (!validateStep(step)) {
         goToStep(step, { validate: false });
         return;
@@ -437,17 +528,35 @@
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
     let delivered = false;
+    let ticket = '';
 
     try {
       const response = await fetch(CONFIG.N8N_WEBHOOK_URL, {
         method: 'POST',
+        // Evita la página de advertencia de ngrok, que responde 200 con HTML
+        // y se confundiría con un envío exitoso. No se fija Content-Type:
+        // el navegador lo arma con el boundary del multipart.
+        headers: { 'ngrok-skip-browser-warning': 'true' },
         body: buildFormData(),
         signal: controller.signal
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await readPayload(response);
 
-      delivered = true;
+      if (response.status === 409) {
+        markDuplicate(readField(payload, ERROR_FIELD));
+      } else if (response.status === 400) {
+        showAlert(
+          'Revisa los datos de tu postulación.',
+          readField(payload, ERROR_FIELD) ||
+            'El servidor rechazó la información enviada. Corrige los datos e inténtalo nuevamente.'
+        );
+      } else if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      } else {
+        delivered = true;
+        ticket = readField(payload, TICKET_FIELD);
+      }
     } catch (error) {
       if (error.name === 'AbortError') {
         showAlert(
@@ -468,7 +577,7 @@
 
     // Fuera del try: un fallo al pintar la confirmación no debe
     // presentarse al candidato como un envío fallido.
-    if (delivered) showSuccess();
+    if (delivered) showSuccess(ticket);
   }
 
   /* ── Eventos ────────────────────────────────────────────── */
@@ -497,7 +606,7 @@
     });
 
     // Validación al salir del campo; corrección en vivo solo si ya hay error.
-    ['nombre', 'correo', 'telefono'].forEach((name) => {
+    ['nombre', 'correo', 'telefono', 'experiencia'].forEach((name) => {
       const input = $(`#${name}`);
       input.addEventListener('blur', () => validateField(name));
       input.addEventListener('input', () => {
@@ -505,7 +614,15 @@
       });
     });
 
-    dom.vacanteGroup.addEventListener('change', () => validateField('vacante'));
+    // El duplicado depende de correo + vacante: si cambia alguno, deja de aplicar.
+    $('#correo').addEventListener('input', clearDuplicate);
+
+    dom.vacanteGroup.addEventListener('change', () => {
+      validateField('vacante');
+      clearDuplicate();
+    });
+
+    dom.consentimiento.addEventListener('change', () => validateField('consentimiento'));
   }
 
   /* ── Arranque ───────────────────────────────────────────── */

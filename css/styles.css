@@ -376,6 +376,13 @@ svg { display: block; }
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.input--narrow { max-width: 9rem; }
+
+.field__optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+
 .field__hint {
   margin-top: 6px;
   font-size: .8125rem;
@@ -468,6 +475,70 @@ svg { display: block; }
 .choice__input:checked + .choice__box .choice__code { color: var(--accent); }
 
 .field.is-invalid .choice__box { border-color: var(--danger-line); }
+
+/* ── Consentimiento ───────────────────────────────────────── */
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .18s var(--ease), background-color .18s var(--ease);
+}
+.check:hover { border-color: #BFC6C9; background: var(--surface-2); }
+
+.check__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.check__box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px; height: 20px;
+  margin-top: 1px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: #fff;
+  transition: background-color .15s var(--ease), border-color .15s var(--ease);
+}
+.check__box svg {
+  width: 13px; height: 13px;
+  opacity: 0;
+  transform: scale(.7);
+  transition: opacity .15s var(--ease), transform .15s var(--ease);
+}
+
+.check__input:checked + .check__box {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check__input:checked + .check__box svg { opacity: 1; transform: scale(1); }
+
+.check__input:focus-visible + .check__box {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.check__text {
+  font-size: .875rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.field.is-invalid .check {
+  border-color: var(--danger-line);
+  background: var(--danger-soft);
+}
 
 /* ── Zona de carga ────────────────────────────────────────── */
 
@@ -673,6 +744,7 @@ svg { display: block; }
               color .18s var(--ease), box-shadow .18s var(--ease), transform .12s var(--ease);
 }
 .btn:active { transform: translateY(1px); }
+.btn[hidden] { display: none; }
 .btn__icon { width: 16px; height: 16px; }
 
 .btn--primary {
@@ -757,12 +829,45 @@ svg { display: block; }
   color: var(--ink-2);
 }
 
+.ticket {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  padding: 9px 8px 9px 16px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+.ticket[hidden] { display: none; }
+
+.ticket__label {
+  font-family: var(--font-mono);
+  font-size: .625rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ticket__value {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
 .done__ref {
   margin-top: 26px;
   font-family: var(--font-mono);
   font-size: .75rem;
   color: var(--muted);
 }
+.ticket:not([hidden]) + .done__ref { margin-top: 12px; }
 
 /* ── Footer ───────────────────────────────────────────────── */
 

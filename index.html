@@ -131,7 +131,7 @@
         <header class="step__head">
           <p class="step__kicker">02 — Vacante</p>
           <h2 class="step__title" id="t2">¿A qué rol te postulas?</h2>
-          <p class="step__sub">Puedes postularte a una vacante por envío.</p>
+          <p class="step__sub">Elige el rol y cuéntanos brevemente tu experiencia.</p>
         </header>
 
         <div class="field" data-field="vacante">
@@ -140,6 +140,24 @@
             <!-- Opciones generadas desde CONFIG.VACANTES en js/app.js -->
           </fieldset>
           <p class="field__error" id="err-vacante" role="alert"></p>
+        </div>
+
+        <div class="field" data-field="experiencia">
+          <label class="field__label" for="experiencia">Años de experiencia</label>
+          <input class="input input--narrow" type="number" id="experiencia" name="experiencia"
+                 min="0" max="50" step="1" inputmode="numeric" placeholder="0"
+                 aria-describedby="hint-experiencia err-experiencia" required>
+          <p class="field__hint" id="hint-experiencia">Escribe 0 si estás empezando.</p>
+          <p class="field__error" id="err-experiencia" role="alert"></p>
+        </div>
+
+        <div class="field" data-field="tecnologias">
+          <label class="field__label" for="tecnologias">
+            Tecnologías <span class="field__optional">(opcional)</span>
+          </label>
+          <input class="input" type="text" id="tecnologias" name="tecnologias" maxlength="200"
+                 placeholder="JavaScript, SQL, Git…" aria-describedby="hint-tecnologias">
+          <p class="field__hint" id="hint-tecnologias">Sepáralas con comas.</p>
         </div>
 
         <footer class="step__actions">
@@ -163,7 +181,8 @@
         </header>
 
         <div class="field" data-field="cv">
-          <input class="sr-only" type="file" id="cv" name="cv" accept="application/pdf,.pdf" aria-describedby="err-cv">
+          <input class="sr-only" type="file" id="cv" name="cv" accept="application/pdf,.pdf"
+                 aria-describedby="err-cv" required>
 
           <label class="drop" id="drop" for="cv">
             <span class="drop__icon" aria-hidden="true">
@@ -228,6 +247,8 @@
           <div class="record__row"><dt>correo</dt><dd id="sumCorreo">—</dd></div>
           <div class="record__row"><dt>telefono</dt><dd id="sumTelefono">—</dd></div>
           <div class="record__row"><dt>vacante</dt><dd id="sumVacante">—</dd></div>
+          <div class="record__row"><dt>experiencia</dt><dd id="sumExperiencia">—</dd></div>
+          <div class="record__row"><dt>tecnologias</dt><dd id="sumTecnologias">—</dd></div>
           <div class="record__row"><dt>cv</dt><dd id="sumCv">—</dd></div>
         </dl>
 
@@ -235,6 +256,21 @@
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.25v4M8 4.9v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
           Al enviar, tu postulación se registra automáticamente y pasa a revisión de nuestro equipo de selección. Te contactaremos por correo.
         </p>
+
+        <div class="field" data-field="consentimiento">
+          <label class="check">
+            <input class="check__input" type="checkbox" id="consentimiento" name="consentimiento"
+                   value="si" aria-describedby="err-consentimiento" required>
+            <span class="check__box" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="check__text">
+              Autorizo el tratamiento de mis datos personales y de mi hoja de vida
+              con el fin de participar en este proceso de selección.
+            </span>
+          </label>
+          <p class="field__error" id="err-consentimiento" role="alert"></p>
+        </div>
 
         <div class="alert" id="submitAlert" role="alert" hidden>
           <div class="alert__body">
@@ -268,6 +304,10 @@
       <h2 class="done__title" id="doneTitle">¡Postulación recibida!</h2>
       <p class="done__text">Hemos recibido correctamente tu información y tu hoja de vida.</p>
       <p class="done__text">Tu postulación será procesada y revisada por nuestro equipo. Gracias por tu interés.</p>
+      <p class="ticket" id="doneTicket" hidden>
+        <span class="ticket__label">Ticket</span>
+        <strong class="ticket__value" id="doneTicketValue"></strong>
+      </p>
       <p class="done__ref">Enviado el <span id="doneStamp">—</span></p>
     </section>
 
