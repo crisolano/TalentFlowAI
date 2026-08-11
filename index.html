@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postulación · TalentFlow</title>
+<meta name="description" content="Completa tus datos, adjunta tu hoja de vida en PDF y postúlate a nuestras vacantes de tecnología.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230B6E6A'/><path d='M9 11h14M9 16h9M9 21h5' stroke='white' stroke-width='2.5' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Sans:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#panel">Ir al formulario</a>
+
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <span class="brand">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7h16M4 12h10M4 17h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand__name">TalentFlow</span>
+    </span>
+    <p class="site-header__tag">Convocatoria abierta · Tecnología</p>
+  </div>
+</header>
+
+<main class="shell layout">
+
+  <!-- ── Columna izquierda: contexto + progreso ───────────────── -->
+  <aside class="rail">
+    <p class="eyebrow">Postulación de candidatos</p>
+    <h1 class="display">Tu próxima oportunidad<br>empieza con un PDF.</h1>
+    <p class="lead">Completa tus datos y adjunta tu hoja de vida. Toma menos de dos minutos.</p>
+
+    <nav aria-label="Progreso del formulario">
+      <ol class="spine" id="spine" style="--fill:0%">
+        <li class="spine__item is-current" data-step="1">
+          <button class="spine__btn" type="button" data-goto="1" aria-current="step">
+            <span class="spine__node">
+              <span class="spine__index">01</span>
+              <svg class="spine__check" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="spine__text">Información</span>
+          </button>
+        </li>
+        <li class="spine__item" data-step="2">
+          <button class="spine__btn" type="button" data-goto="2">
+            <span class="spine__node">
+              <span class="spine__index">02</span>
+              <svg class="spine__check" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="spine__text">Vacante</span>
+          </button>
+        </li>
+        <li class="spine__item" data-step="3">
+          <button class="spine__btn" type="button" data-goto="3">
+            <span class="spine__node">
+              <span class="spine__index">03</span>
+              <svg class="spine__check" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="spine__text">Hoja de vida</span>
+          </button>
+        </li>
+        <li class="spine__item" data-step="4">
+          <button class="spine__btn" type="button" data-goto="4">
+            <span class="spine__node">
+              <span class="spine__index">04</span>
+              <svg class="spine__check" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="spine__text">Enviar</span>
+          </button>
+        </li>
+      </ol>
+      <p class="spine__caption" id="spineCaption">Paso 1 de 4 · Información</p>
+    </nav>
+
+    <p class="rail__foot">Tus datos se usan únicamente para este proceso de selección.</p>
+  </aside>
+
+  <!-- ── Columna derecha: formulario ──────────────────────────── -->
+  <div class="panel" id="panel">
+
+    <form class="form" id="applicationForm" novalidate autocomplete="on">
+
+      <!-- Paso 1 ................................................ -->
+      <section class="step is-active" data-step="1" aria-labelledby="t1">
+        <header class="step__head">
+          <p class="step__kicker">01 — Información</p>
+          <h2 class="step__title" id="t1">¿Quién eres?</h2>
+          <p class="step__sub">Usaremos estos datos para contactarte sobre tu postulación.</p>
+        </header>
+
+        <div class="field" data-field="nombre">
+          <label class="field__label" for="nombre">Nombre completo</label>
+          <input class="input" type="text" id="nombre" name="nombre" placeholder="María Fernanda Ríos"
+                 autocomplete="name" maxlength="80" aria-describedby="err-nombre" required>
+          <p class="field__error" id="err-nombre" role="alert"></p>
+        </div>
+
+        <div class="field" data-field="correo">
+          <label class="field__label" for="correo">Correo electrónico</label>
+          <input class="input" type="email" id="correo" name="correo" placeholder="maria@correo.com"
+                 autocomplete="email" inputmode="email" maxlength="120" aria-describedby="err-correo" required>
+          <p class="field__error" id="err-correo" role="alert"></p>
+        </div>
+
+        <div class="field" data-field="telefono">
+          <label class="field__label" for="telefono">Teléfono</label>
+          <input class="input" type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567"
+                 autocomplete="tel" inputmode="tel" maxlength="25" aria-describedby="hint-telefono err-telefono" required>
+          <p class="field__hint" id="hint-telefono">Incluye el indicativo del país si estás fuera de Colombia.</p>
+          <p class="field__error" id="err-telefono" role="alert"></p>
+        </div>
+
+        <footer class="step__actions">
+          <button class="btn btn--primary" type="button" data-next="2">
+            Continuar
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- Paso 2 ................................................ -->
+      <section class="step" data-step="2" aria-labelledby="t2" hidden>
+        <header class="step__head">
+          <p class="step__kicker">02 — Vacante</p>
+          <h2 class="step__title" id="t2">¿A qué rol te postulas?</h2>
+          <p class="step__sub">Puedes postularte a una vacante por envío.</p>
+        </header>
+
+        <div class="field" data-field="vacante">
+          <fieldset class="choices" id="vacanteGroup" aria-describedby="err-vacante">
+            <legend class="sr-only">Selecciona una vacante</legend>
+            <!-- Opciones generadas desde CONFIG.VACANTES en js/app.js -->
+          </fieldset>
+          <p class="field__error" id="err-vacante" role="alert"></p>
+        </div>
+
+        <footer class="step__actions">
+          <button class="btn btn--ghost" type="button" data-back="1">
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Volver
+          </button>
+          <button class="btn btn--primary" type="button" data-next="3">
+            Continuar
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- Paso 3 ................................................ -->
+      <section class="step" data-step="3" aria-labelledby="t3" hidden>
+        <header class="step__head">
+          <p class="step__kicker">03 — Hoja de vida</p>
+          <h2 class="step__title" id="t3">Adjunta tu CV</h2>
+          <p class="step__sub">Nos permite conocer tu experiencia antes de la primera entrevista.</p>
+        </header>
+
+        <div class="field" data-field="cv">
+          <input class="sr-only" type="file" id="cv" name="cv" accept="application/pdf,.pdf" aria-describedby="err-cv">
+
+          <label class="drop" id="drop" for="cv">
+            <span class="drop__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 10.5V19a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6.5L19 8.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M12 17v-5.5M9.5 14l2.5-2.5 2.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="drop__title">Arrastra tu hoja de vida aquí</span>
+            <span class="drop__hint">o <span class="drop__link">selecciona un archivo</span></span>
+            <span class="drop__meta">PDF · máximo <span data-max-size>5 MB</span></span>
+          </label>
+
+          <div class="filecard" id="fileCard" hidden>
+            <span class="filecard__badge" aria-hidden="true">PDF</span>
+            <div class="filecard__body">
+              <p class="filecard__name" id="fileName"></p>
+              <p class="filecard__meta" id="fileMeta"></p>
+              <p class="filecard__status" id="fileStatus">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Archivo validado
+              </p>
+            </div>
+            <div class="filecard__actions">
+              <label class="iconbtn" for="cv" title="Cambiar archivo">
+                <span class="sr-only">Cambiar archivo</span>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </label>
+              <button class="iconbtn iconbtn--danger" type="button" id="removeFile" title="Quitar archivo">
+                <span class="sr-only">Quitar archivo</span>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8a1 1 0 0 0 1 .9h3.8a1 1 0 0 0 1-.9l.6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="field__error" id="err-cv" role="alert"></p>
+        </div>
+
+        <footer class="step__actions">
+          <button class="btn btn--ghost" type="button" data-back="2">
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Volver
+          </button>
+          <button class="btn btn--primary" type="button" data-next="4">
+            Revisar postulación
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- Paso 4 ................................................ -->
+      <section class="step" data-step="4" aria-labelledby="t4" hidden>
+        <header class="step__head">
+          <p class="step__kicker">04 — Enviar</p>
+          <h2 class="step__title" id="t4">Revisa y envía</h2>
+          <p class="step__sub">Confirma que todo esté correcto antes de enviar.</p>
+        </header>
+
+        <dl class="record" id="summary">
+          <div class="record__row"><dt>nombre</dt><dd id="sumNombre">—</dd></div>
+          <div class="record__row"><dt>correo</dt><dd id="sumCorreo">—</dd></div>
+          <div class="record__row"><dt>telefono</dt><dd id="sumTelefono">—</dd></div>
+          <div class="record__row"><dt>vacante</dt><dd id="sumVacante">—</dd></div>
+          <div class="record__row"><dt>cv</dt><dd id="sumCv">—</dd></div>
+        </dl>
+
+        <p class="notice">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.25v4M8 4.9v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Al enviar, tu postulación se registra automáticamente y pasa a revisión de nuestro equipo de selección. Te contactaremos por correo.
+        </p>
+
+        <div class="alert" id="submitAlert" role="alert" hidden>
+          <div class="alert__body">
+            <p class="alert__title" id="alertTitle">No pudimos enviar tu postulación.</p>
+            <p class="alert__text" id="alertText">Verifica tu conexión e inténtalo nuevamente.</p>
+          </div>
+        </div>
+
+        <footer class="step__actions">
+          <button class="btn btn--ghost" type="button" data-back="3">
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Volver
+          </button>
+          <button class="btn btn--primary btn--submit" type="submit" id="submitBtn">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btn__label" id="submitLabel">Enviar postulación</span>
+          </button>
+        </footer>
+      </section>
+
+    </form>
+
+    <!-- Pantalla de éxito ....................................... -->
+    <section class="done" id="successView" aria-labelledby="doneTitle" hidden tabindex="-1">
+      <span class="done__mark" aria-hidden="true">
+        <svg viewBox="0 0 52 52" fill="none">
+          <circle class="done__ring" cx="26" cy="26" r="23" stroke="currentColor" stroke-width="2"/>
+          <path class="done__tick" d="M16 26.5l7 7 13-14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <h2 class="done__title" id="doneTitle">¡Postulación recibida!</h2>
+      <p class="done__text">Hemos recibido correctamente tu información y tu hoja de vida.</p>
+      <p class="done__text">Tu postulación será procesada y revisada por nuestro equipo. Gracias por tu interés.</p>
+      <p class="done__ref">Enviado el <span id="doneStamp">—</span></p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="shell site-footer__inner">
+    <p>TalentFlow · Proceso de selección</p>
+    <p>Un envío por vacante. Si necesitas corregir algo, escríbenos.</p>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
