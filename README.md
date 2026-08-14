@@ -152,3 +152,41 @@ petición al webhook → pestaña *Payload*.
 - Durante el envío el botón se deshabilita, así que no hay envíos dobles.
 - Si el envío falla, los datos y el archivo se conservan para reintentar.
 - El candidato nunca ve score, evaluación de IA ni clasificación.
+
+## Dashboard (uso interno de RRHH)
+
+`dashboard.html` muestra el estado agregado del proceso: total de candidatos,
+candidatos por vacante, distribución del score de compatibilidad, postulaciones
+por fecha, pendientes de revisión y en entrevista. **No** requiere ni expone
+nombre, correo o teléfono de ningún candidato — el workflow de n8n que lo
+alimenta descarta esos campos antes de responder.
+
+No incluye "tiempo promedio de revisión": la hoja solo registra
+`Fecha_Postulacion`, no cuándo RRHH actualiza `Estado` o completa
+`Revision_RRHH`, así que no hay forma de calcularlo sin agregar esa columna.
+Se dejó fuera del dashboard en vez de mostrar un dato inventado.
+
+```
+Google Sheets → n8n (Webhook GET, n8n/flujo-dashboard-datos.json) → dashboard.html
+```
+
+### Conectarlo
+
+1. Importa `n8n/flujo-dashboard-datos.json` en n8n (usa las mismas credenciales
+   de Google Sheets que el flujo de postulación) y actívalo.
+2. Copia la URL de producción del Webhook GET (`/webhook/dashboard-data`) en
+   `js/dashboard-config.js` → `DASHBOARD_WEBHOOK_URL`.
+3. Configura *Allowed Origins (CORS)* en ese nodo Webhook igual que en el de
+   postulación (ver punto 4.2 arriba).
+
+Mientras `DASHBOARD_WEBHOOK_URL` conserve el placeholder, la página muestra
+datos de ejemplo **sintéticos** (no son candidatos reales) con un aviso visible,
+para que puedas ver el diseño terminado sin depender de n8n.
+
+### Seguridad
+
+Igual que el webhook de postulación, este webhook GET **no tiene autenticación**
+propia — solo la URL lo protege. No expone datos personales, pero sí expone el
+volumen de postulaciones a quien la descubra; no compartas la URL fuera del
+equipo. Añadir un token validado en el nodo `Agregar Metricas` es la mejora
+recomendada antes de un uso más allá de una demo.

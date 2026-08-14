@@ -1,0 +1,395 @@
+/* ============================================================
+   TalentFlow — Dashboard
+   Se apoya en los tokens de css/styles.css (--paper, --surface,
+   --ink, --muted, --line, --accent…). Este archivo solo agrega
+   lo que el dashboard necesita: rampa ordinal de score, tarjetas,
+   barras/columnas y tooltip.
+   ============================================================ */
+
+:root {
+  /* Rampa ordinal (una sola familia de color, claro→oscuro = menor→mayor
+     compatibilidad). Validada con scripts/validate_palette.js --ordinal
+     de la skill dataviz: monotonía, ΔL entre pasos y contraste del
+     extremo claro contra el fondo, todo en PASS. */
+  --score-0: #8BC0B9;  /* 0-19 */
+  --score-1: #72AEA6;  /* 20-39 */
+  --score-2: #529891;  /* 40-59 */
+  --score-3: #357F78;  /* 60-79 */
+  --score-4: #0B6E6A;  /* 80-100 · = --accent */
+  --score-none: #C7CDCF; /* sin score: neutro, no es parte de la rampa de magnitud */
+
+  --warn: #9A6B12;
+  --warn-soft: #FBF3E4;
+  --warn-line: #ECD8AF;
+}
+
+/* ── Layout general ───────────────────────────────────────────── */
+
+.dash {
+  flex: 1;
+  padding-block: 40px 72px;
+}
+
+.dash__head { margin-bottom: 28px; }
+
+.dash__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -.03em;
+}
+
+.dash__sub {
+  margin-top: 8px;
+  max-width: 42rem;
+  color: var(--ink-2);
+}
+
+/* ── Banner de estado (demo / error) ─────────────────────────── */
+
+.banner {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding: 13px 16px;
+  border-radius: var(--r-md);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+.banner[hidden] { display: none; }
+.banner svg { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+
+.banner--demo { background: var(--accent-soft); border: 1px solid var(--accent-line); color: var(--ink-2); }
+.banner--demo svg { color: var(--accent); }
+
+.banner--error { background: var(--danger-soft); border: 1px solid var(--danger-line); color: var(--ink-2); }
+.banner--error svg { color: var(--danger); }
+
+.banner strong { color: var(--ink); }
+
+/* ── Filtros ──────────────────────────────────────────────────── */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.filters__label {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filters__select {
+  padding: 9px 50px 9px 20px;
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="%236B7480" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 12px center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color .15s var(--ease);
+}
+.filters__select:hover { border-color: #BFC6C9; }
+.filters__select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.filters__updated {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* ── KPI (stat tiles) ─────────────────────────────────────────── */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.kpi {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.kpi__label {
+  font-size: .8125rem;
+  color: var(--muted);
+}
+
+.kpi__value {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -.03em;
+  font-variant-numeric: proportional-nums;
+}
+.kpi--pending .kpi__value { color: var(--warn); }
+
+/* ── Tarjetas de gráfico ──────────────────────────────────────── */
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 16px;
+}
+
+.chart-card {
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.chart-card__title {
+  font-size: .9375rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.chart-card__sub {
+  margin-top: 3px;
+  font-size: .8125rem;
+  color: var(--muted);
+}
+
+.chart-card__body { margin-top: 20px; }
+
+.chart-card__empty {
+  padding: 28px 0;
+  text-align: center;
+  font-size: .875rem;
+  color: var(--muted);
+}
+
+/* ── Barras horizontales (por vacante) ────────────────────────── */
+
+.bar-list { display: flex; flex-direction: column; gap: 14px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 8rem 1fr 2.25rem;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar-row__label {
+  font-size: .8125rem;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-row__track {
+  position: relative;
+  height: 22px;
+  background: var(--surface-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  overflow: hidden;
+}
+
+.bar-row__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+  width: 0;
+  transition: width .5s var(--ease);
+}
+.bar-row__fill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.bar-row__value {
+  font-family: var(--font-mono);
+  font-size: .8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  text-align: right;
+}
+
+/* ── Columnas verticales (score, fecha) ───────────────────────── */
+
+.col-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 11rem;
+  padding-top: 8px;
+}
+
+.col-chart--dense { gap: 4px; }
+
+.col {
+  flex: 1;
+  min-width: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.col__track {
+  position: relative;
+  width: 100%;
+  max-width: 34px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.col__fill {
+  width: 100%;
+  height: 2px;
+  min-height: 2px;
+  background: var(--accent);
+  border-radius: 4px 4px 0 0;
+  transition: height .5s var(--ease);
+}
+.col__fill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.col__value {
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.col__label {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: .625rem;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.col-chart--dense .col__label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  height: 3.2rem;
+}
+
+/* Leyenda de la rampa ordinal (score) */
+.ramp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.ramp-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .75rem;
+  color: var(--muted);
+}
+.ramp-legend__swatch {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+}
+
+/* ── Tooltip compartido ───────────────────────────────────────── */
+
+.chart-tooltip {
+  position: fixed;
+  z-index: 20;
+  padding: 7px 10px;
+  background: var(--ink);
+  color: #fff;
+  font-size: .75rem;
+  line-height: 1.4;
+  border-radius: var(--r-sm);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity .1s var(--ease);
+  white-space: nowrap;
+  box-shadow: 0 8px 20px -8px rgba(16, 24, 32, .4);
+}
+.chart-tooltip.is-visible { opacity: 1; }
+.chart-tooltip strong { font-variant-numeric: tabular-nums; }
+
+/* ── Vista de tabla (accesibilidad) ──────────────────────────── */
+
+.table-toggle {
+  margin-top: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.table-toggle__summary {
+  padding: 16px 20px;
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.table-toggle__summary::-webkit-details-marker { display: none; }
+.table-toggle__summary::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform .15s var(--ease);
+}
+.table-toggle[open] .table-toggle__summary::before { transform: rotate(45deg); }
+
+.table-toggle__body { border-top: 1px solid var(--line); overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8125rem;
+}
+.data-table th, .data-table td {
+  padding: 10px 20px;
+  text-align: left;
+  white-space: nowrap;
+}
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+}
+.data-table td { font-variant-numeric: tabular-nums; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface-2); }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  .bar-row { grid-template-columns: 5.5rem 1fr 2rem; }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .filters { flex-wrap: wrap; }
+  .filters__updated { margin-left: 0; width: 100%; }
+}

@@ -1,0 +1,79 @@
+{
+  "name": "Flujo 03 - Dashboard (Datos Agregados)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "dashboard-data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f1d10001-0000-4000-8000-000000000001",
+      "name": "Webhook Dashboard",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-680, 300],
+      "webhookId": "dashboard-data-rrhh"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jW5jDoMTkmCf_NaHu0yDey41GuRxBg64lbf1CsoVwTQ",
+          "mode": "list",
+          "cachedResultName": "n9n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jW5jDoMTkmCf_NaHu0yDey41GuRxBg64lbf1CsoVwTQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jW5jDoMTkmCf_NaHu0yDey41GuRxBg64lbf1CsoVwTQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "f1d10002-0000-4000-8000-000000000002",
+      "name": "Leer Postulaciones",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [-460, 300],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "iR8mkGGUm263m1RH", "name": "Google Sheets account" }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// AGREGAR METRICAS PARA EL DASHBOARD\n// IMPORTANTE: este nodo es el unico punto donde se decide\n// que sale hacia el navegador. A proposito NUNCA se incluyen\n// Nombre, Correo ni Telefono: el dashboard es publico-ish\n// (protegido solo por la URL del webhook), asi que solo debe\n// exponer datos agregados/anonimizados, nunca PII.\n// ============================================\n\nconst filas = $input.all()\n  .map(i => i.json)\n  .filter(f => f.ID_Candidato && String(f.ID_Candidato).trim() !== '');\n\nconst detalle = filas.map(f => {\n  const raw = f.Score_Compatibilidad;\n  const sinScore = raw === '' || raw === null || raw === undefined || isNaN(Number(raw));\n  return {\n    vacante: String(f.Vacante || 'sin_vacante').trim(),\n    score: sinScore ? null : Number(raw),\n    estado: String(f.Estado || 'SIN_ESTADO').trim().toUpperCase(),\n    fecha: String(f.Fecha_Postulacion || '').slice(0, 10) || null,\n  };\n});\n\nreturn [{\n  json: {\n    generado_en: new Date().toISOString(),\n    total_candidatos: detalle.length,\n    detalle,\n  },\n}];\n"
+      },
+      "id": "f1d10003-0000-4000-8000-000000000003",
+      "name": "Agregar Metricas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-240, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "f1d10004-0000-4000-8000-000000000004",
+      "name": "Responder Dashboard",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [-20, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Dashboard": { "main": [[{ "node": "Leer Postulaciones", "type": "main", "index": 0 }]] },
+    "Leer Postulaciones": { "main": [[{ "node": "Agregar Metricas", "type": "main", "index": 0 }]] },
+    "Agregar Metricas": { "main": [[{ "node": "Responder Dashboard", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2d07c195e378a2b50765af1e79db538b9c72792fda921db150a9947b182004a1"
+  }
+}

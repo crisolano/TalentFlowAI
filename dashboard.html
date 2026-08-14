@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · TalentFlow</title>
+<meta name="description" content="Panel de seguimiento de postulaciones: candidatos por vacante, distribución de score y estado del proceso.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230B6E6A'/><path d='M9 11h14M9 16h9M9 21h5' stroke='white' stroke-width='2.5' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Sans:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Ir al contenido</a>
+
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <span class="brand">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 7h16M4 12h10M4 17h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand__name">TalentFlow</span>
+    </span>
+    <nav class="site-header__nav" aria-label="Navegación">
+      <a class="site-header__link is-active" href="dashboard.html">Dashboard</a>
+      <a class="site-header__link" href="index.html">Postulación</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell dash" id="main">
+
+  <div class="banner banner--demo" id="banner" role="status" hidden>
+    <svg id="bannerIcon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.25v4M8 4.9v.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <span id="bannerText"></span>
+  </div>
+
+  <header class="dash__head">
+    <p class="eyebrow">Panel de seguimiento</p>
+    <h1 class="dash__title">Postulaciones en proceso</h1>
+    <p class="dash__sub">Datos agregados y anonimizados desde Google Sheets. No incluye nombre, correo ni teléfono de candidatos — solo vacante, score, estado y fecha.</p>
+  </header>
+
+  <div class="filters">
+    <label class="filters__label" for="vacanteFilter">Vacante</label>
+    <select class="filters__select" id="vacanteFilter">
+      <option value="todas">Todas las vacantes</option>
+    </select>
+    <button class="btn btn--ghost" type="button" id="refreshBtn" style="min-height:38px;padding:0 14px;font-size:.8125rem;">
+      Actualizar
+    </button>
+    <span class="filters__updated" id="lastUpdated"></span>
+  </div>
+
+  <section class="kpis" aria-label="Indicadores generales">
+    <div class="kpi">
+      <p class="kpi__label">Total de candidatos</p>
+      <p class="kpi__value" id="kpiTotal">—</p>
+    </div>
+    <div class="kpi kpi--pending">
+      <p class="kpi__label">Pendientes de revisión</p>
+      <p class="kpi__value" id="kpiPendientes">—</p>
+    </div>
+    <div class="kpi">
+      <p class="kpi__label">En entrevista</p>
+      <p class="kpi__value" id="kpiEntrevista">—</p>
+    </div>
+  </section>
+
+  <section class="charts" aria-label="Gráficos">
+    <div class="chart-card">
+      <h2 class="chart-card__title">Candidatos por vacante</h2>
+      <p class="chart-card__sub">Volumen de postulaciones recibidas por rol</p>
+      <div class="chart-card__body" id="vacanteChart"></div>
+    </div>
+
+    <div class="chart-card">
+      <h2 class="chart-card__title">Distribución de score de compatibilidad</h2>
+      <p class="chart-card__sub">Cuántos candidatos caen en cada rango de 0 a 100</p>
+      <div class="chart-card__body" id="scoreChart"></div>
+    </div>
+
+    <div class="chart-card">
+      <h2 class="chart-card__title">Postulaciones por fecha</h2>
+      <p class="chart-card__sub">Volumen de envíos por día</p>
+      <div class="chart-card__body" id="fechaChart"></div>
+    </div>
+  </section>
+
+  <details class="table-toggle">
+    <summary class="table-toggle__summary">Ver datos en tabla (<span id="tableCount">0</span> candidatos)</summary>
+    <div class="table-toggle__body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Vacante</th>
+            <th scope="col">Score</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </details>
+
+</main>
+
+<div class="chart-tooltip" id="chartTooltip" role="status" aria-live="polite"></div>
+
+<footer class="site-footer">
+  <div class="shell site-footer__inner">
+    <p>TalentFlow · Panel interno de Recursos Humanos</p>
+    <p>No comparte esta URL fuera del equipo: aunque no expone datos personales, sí expone volumen de postulaciones.</p>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/dashboard-config.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

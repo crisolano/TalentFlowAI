@@ -160,6 +160,24 @@ svg { display: block; }
   color: var(--muted);
 }
 
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.site-header__link {
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding: 8px 4px;
+  border-bottom: 2px solid transparent;
+  transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+.site-header__link:hover,
+.site-header__link.is-active { color: var(--accent); border-color: var(--accent); }
+
 /* ── Layout ───────────────────────────────────────────────── */
 
 .layout {
