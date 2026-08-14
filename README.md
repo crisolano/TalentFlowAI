@@ -218,4 +218,104 @@ La IA **extrae**; el score y la clasificación los calcula un nodo de código co
 | 7 | Envío de notificación a Telegram (score alto) | ✅ Confirmado |
 | 8 | Envío de confirmación por Gmail al candidato | ✅ Confirmado |
 
+Nota: estos 8 casos no cubren los 15 escenarios del requisito original. Sin
+probar todavía: score medio y bajo por separado, PDF corrupto (distinto de
+escaneado/vacío), campos incompletos, vacante inexistente, candidato
+inexistente en el bot de Telegram, error de API, error del modelo de IA,
+error de almacenamiento, y fallo de notificación.
 
+---
+
+## 9. Ejecutar el formulario en local
+
+Sírvelo por HTTP; no lo abras con doble clic (`file://` rompe las peticiones):
+
+```bash
+# Python
+python -m http.server 8080
+
+# Node
+npx serve .
+```
+
+Luego entra a <http://localhost:8080>.
+
+---
+
+## 10. Configurar el Webhook de postulación en n8n
+
+En el nodo `Webhook Postulacion` del Flujo 1:
+
+1. **HTTP Method:** `POST` · **Respond:** `Using Respond to Webhook`.
+2. **CORS y preflight** — el navegador llama al webhook desde otro origen. En
+   *Options*, agrega `Allowed Origins (CORS)` con el dominio donde publiques el
+   formulario (o `*` mientras pruebas). El header `ngrok-skip-browser-warning`
+   que manda el frontend **no** es de los permitidos por defecto en CORS, así
+   que el navegador manda antes un `OPTIONS` de preflight: n8n debe responderlo
+   aceptando ese header, o el fetch falla con un error de CORS antes de llegar
+   siquiera al workflow. *(Este mismo problema bloqueó la conexión del
+   dashboard dos veces durante el desarrollo — revisa este punto primero si
+   algo no responde.)*
+3. **URL de prueba vs. producción** — `/webhook-test/...` solo responde
+   mientras el editor está en modo escucha (y solo una vez por click en
+   "Listen for test event"); `/webhook/...` requiere el workflow **activado**.
+   Para producción, usa siempre la segunda.
+4. **Códigos de respuesta** — el frontend los distingue:
+
+   | Código | Campo que lee | Qué hace el formulario |
+   |---|---|---|
+   | `200` | `json.ticket` | Pantalla de éxito con el ticket. |
+   | `400` | `json.error` | Muestra ese texto como error corregible, conservando los datos. |
+   | `409` | `json.error` | Duplicado: muestra el texto y **retira el botón de envío**. |
+   | otro | — | Error genérico recuperable. |
+
+   Son los únicos nombres que se leen: `id`, `ticketId`, `mensaje` o `message`
+   se ignoran a propósito.
+5. **Validación en servidor** — `Normalizar Datos` repite las validaciones de
+   correo, teléfono, experiencia, consentimiento, y tipo del archivo. Las del
+   navegador son de usabilidad; cualquiera puede saltárselas llamando al
+   webhook directamente.
+6. **Autenticación** — hoy ninguno de los dos webhooks (postulación ni
+   dashboard) tiene autenticación propia, solo la URL los protege. Pendiente
+   antes de un uso más allá de una demo.
+
+### Probar la conexión
+
+1. Abre el workflow y pulsa **Listen for test event** (o actívalo para usar la
+   URL de producción).
+2. Completa el formulario y envía.
+3. Verifica en n8n que el ítem trae los campos de texto y una propiedad
+   binaria con el PDF; y en Sheets que la fila se guardó completa.
+
+---
+
+## 11. Dashboard — conexión y seguridad
+
+1. Importa `n8n/flujo-dashboard-datos.json` (usa las mismas credenciales de
+   Google Sheets que el Flujo 1) y actívalo.
+2. Copia la URL de producción del `Webhook Dashboard` (`/webhook/dashboard-data`)
+   en `js/dashboard-config.js` → `DASHBOARD_WEBHOOK_URL`.
+3. Configura *Allowed Origins (CORS)* en ese nodo igual que en el punto 10.2.
+
+Mientras `DASHBOARD_WEBHOOK_URL` conserve el placeholder, la página muestra
+datos de ejemplo **sintéticos** (no son candidatos reales), con un aviso visible.
+
+No incluye "tiempo promedio de revisión": la hoja solo registra
+`Fecha_Postulacion`, no cuándo RRHH actualiza `Estado` o completa
+`Revision_RRHH`, así que no hay forma de calcularlo sin agregar esa columna.
+Se dejó fuera del dashboard en vez de mostrar un dato inventado.
+
+**Seguridad:** igual que el webhook de postulación, este webhook GET no tiene
+autenticación propia. No expone datos personales (nombre/correo/teléfono nunca
+llegan al navegador), pero sí expone el volumen de postulaciones a quien
+descubra la URL — no la compartas fuera del equipo.
+
+---
+
+## 12. Notas de comportamiento del frontend
+
+- La validación bloquea el avance entre pasos; se puede retroceder libremente.
+- El PDF se verifica por extensión, MIME, tamaño y firma `%PDF-`.
+- Durante el envío el botón se deshabilita, así que no hay envíos dobles.
+- Si el envío falla, los datos y el archivo se conservan para reintentar.
+- El candidato nunca ve score, evaluación de IA ni clasificación.
