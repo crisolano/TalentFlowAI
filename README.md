@@ -175,7 +175,7 @@ Requisitos por vacante (definidos en código, no en Sheets):
 
 ---
 
-## 8. Prompts utilizados
+## 7. Prompts utilizados
 
 ### Prompt de análisis de CV (nodo "Analizar CV con IA", Groq)
 
@@ -205,7 +205,7 @@ La IA **extrae**; el score y la clasificación los calcula un nodo de código co
 
 ---
 
-## 9. Pruebas realizadas
+## 8. Pruebas realizadas
 
 | # | Caso de prueba | Resultado |
 |---|---|---|
