@@ -10,6 +10,7 @@
   'use strict';
 
   const TOTAL_STEPS = 4;
+  /*NO PONER*/
   const WEBHOOK_PLACEHOLDER = 'PEGAR_AQUI_WEBHOOK_N8N';
 
   const $ = (selector, root = document) => root.querySelector(selector);
