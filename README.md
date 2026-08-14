@@ -88,7 +88,8 @@ Recibe la postulación y hace todo el pipeline hasta guardar en Sheets, Cosas im
 6. **Preparar Envio Notificaciones** → **Llamar Notificaciones** — dispara el subworkflow (sin esperar su respuesta).
 
 
-![alt text](image.png)
+![Imagen](./images/image.png)
+
 
 ### Flujo 2 — Notificaciones 
 
@@ -97,7 +98,7 @@ Se ejecuta desde el Flujo 1. Recibe los datos ya guardados y:
 - Si `es_prioritaria` (score ≥ 80) → envía mensaje HTML a un chat de Telegram fijo (RRHH).
 - Si el candidato tiene correo válido → envía confirmación por Gmail, **sin score ni evaluación**, solo el número de ticket.
 
-![alt text](image-2.png)
+![Imagen 2](./images/image-2.png)
 
 ### Flujo 3 — Bot de Telegram
 
@@ -112,13 +113,13 @@ Trigger de Telegram + whitelist por `chatId`. Un único nodo de código actúa c
 
 Usuarios fuera del whitelist reciben un mensaje de rechazo.
 
-![alt text](image-3.png)
+![Imagen 3](./images/image-3.png)
 
 ### Flujo 4 — Dashboard (`flujo-dashboard-datos.json`)
 
 Webhook `GET /dashboard-data` → lee Sheets → agrega métricas (por vacante, por estado, por fecha, distribución de score) → responde JSON. **Nunca** incluye nombre, correo ni teléfono; solo datos agregados/anonimizados.
 
-![alt text](image-1.png)
+![Imagen 1](./images/image-1.png)
 
 ---
 
