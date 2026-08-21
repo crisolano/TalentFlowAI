@@ -13,7 +13,7 @@
 
 const DASHBOARD_CONFIG = {
   /** URL del webhook GET que devuelve los datos agregados. Reemplaza el placeholder. */
-  DASHBOARD_WEBHOOK_URL: 'https://automaker-quicken-humbly.ngrok-free.dev/webhook/dashboard-data',
+  DASHBOARD_WEBHOOK_URL: 'https://shining-marathon-pessimism.ngrok-free.dev/webhook/dashboard-data',
 
   /** Tiempo máximo de espera de la petición, en milisegundos. */
   REQUEST_TIMEOUT_MS: 15000

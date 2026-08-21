@@ -8,7 +8,7 @@
 
 const CONFIG = {
   /** URL del webhook de producción de n8n. Reemplaza el placeholder. */
-  N8N_WEBHOOK_URL: 'https://automaker-quicken-humbly.ngrok-free.dev/webhook/postulacion',
+  N8N_WEBHOOK_URL: 'https://shining-marathon-pessimism.ngrok-free.dev/webhook/postulacion',
 
   /** Tamaño máximo aceptado para la hoja de vida, en megabytes. */
   MAX_CV_SIZE_MB: 5,
